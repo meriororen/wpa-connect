@@ -4,13 +4,25 @@ import (
 	"errors"
 
 	"fmt"
+	"net"
+	"time"
+
 	"github.com/godbus/dbus"
 	"github.com/mark2b/wpa-connect/internal/log"
 	"github.com/mark2b/wpa-connect/internal/wpa_cli"
 	"github.com/mark2b/wpa-connect/internal/wpa_dbus"
-	"net"
-	"time"
 )
+
+func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (bool, e error) {
+	self.deadTime = time.Now().Add(timeout)
+	if wpa, err := wpa_dbus.NewWPA(); err == nil {
+		if wpa.ReadInterface(self.NetInterface); wpa.Error == nil {
+			iface := wpa.Interface
+			iface.Disconnect()
+			println("Disconnect from wlan")
+		}
+	}
+}
 
 func (self *connectManager) Connect(ssid string, password string, timeout time.Duration) (connectionInfo ConnectionInfo, e error) {
 	self.deadTime = time.Now().Add(timeout)
