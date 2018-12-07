@@ -19,7 +19,6 @@ func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (r bo
 		if wpa.ReadInterface(self.NetInterface); wpa.Error == nil {
 			iface := wpa.Interface
 			iface.Disconnect()
-			println("Disconnect from wlan")
 			return true, nil
 		}
 	}
