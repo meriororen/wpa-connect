@@ -13,7 +13,7 @@ import (
 	"github.com/strobsi/wpa-connect/internal/wpa_dbus"
 )
 
-func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (bool, e error) {
+func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (r bool, e error) {
 	self.deadTime = time.Now().Add(timeout)
 	if wpa, err := wpa_dbus.NewWPA(); err == nil {
 		if wpa.ReadInterface(self.NetInterface); wpa.Error == nil {
@@ -23,6 +23,7 @@ func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (bool
 			return true, nil
 		}
 	}
+	return false, nil
 }
 
 func (self *connectManager) Connect(ssid string, password string, timeout time.Duration) (connectionInfo ConnectionInfo, e error) {
