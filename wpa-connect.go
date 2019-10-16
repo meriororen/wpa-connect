@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/godbus/dbus"
-	"github.com/strobsi/wpa-connect/internal/log"
-	"github.com/strobsi/wpa-connect/internal/wpa_cli"
-	"github.com/strobsi/wpa-connect/internal/wpa_dbus"
+	"github.com/meriororen/wpa-connect/internal/log"
+	"github.com/meriororen/wpa-connect/internal/wpa_cli"
+	"github.com/meriororen/wpa-connect/internal/wpa_dbus"
 )
 
 func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (r bool, e error) {
