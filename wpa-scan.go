@@ -6,7 +6,7 @@ import (
 	"github.com/meriororen/wpa-connect/internal/wpa_dbus"
 )
 
-func (self *scanManager) Scan() (bssList []BSS, e error) {
+func (self *ScanManager) Scan() (bssList []BSS, e error) {
 	self.scanContext = &scanContext{}
 	self.scanContext.scanDone = make(chan bool)
 	if wpa, err := wpa_dbus.NewWPA(); err == nil {
@@ -41,7 +41,7 @@ func (self *scanManager) Scan() (bssList []BSS, e error) {
 	return
 }
 
-func (self *scanManager) onScanSignal(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
+func (self *ScanManager) onScanSignal(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	log.Log.Debug(signal.Name, signal.Path)
 	switch signal.Name {
 	case "fi.w1.wpa_supplicant1.Interface.BSSAdded":
@@ -55,7 +55,7 @@ func (self *scanManager) onScanSignal(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	}
 }
 
-func (self *scanManager) processScanDone(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
+func (self *ScanManager) processScanDone(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	log.Log.Debug("processScanDone")
 	if self.scanContext.phaseWaitForScanDone {
 		self.scanContext.phaseWaitForScanDone = false
@@ -80,11 +80,7 @@ type scanContext struct {
 	scanDone             chan bool
 }
 
-type scanManager struct {
+type ScanManager struct {
 	scanContext  *scanContext
 	NetInterface string
 }
-
-var (
-	ScanManager = &scanManager{NetInterface: "wlan0"}
-)

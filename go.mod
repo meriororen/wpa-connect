@@ -1,4 +1,4 @@
-module github.com/strobsi/wpa-connect
+module github.com/meriororen/wpa-connect
 
 require (
 	github.com/ThomasRooney/gexpect v0.0.0-20161231170123-5482f0350944

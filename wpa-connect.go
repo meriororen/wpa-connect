@@ -13,7 +13,7 @@ import (
 	"github.com/meriororen/wpa-connect/internal/wpa_dbus"
 )
 
-func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (r bool, e error) {
+func (self *ConnectManager) Disconnect(ssid string, timeout time.Duration) (r bool, e error) {
 	self.deadTime = time.Now().Add(timeout)
 	if wpa, err := wpa_dbus.NewWPA(); err == nil {
 		if wpa.ReadInterface(self.NetInterface); wpa.Error == nil {
@@ -25,7 +25,7 @@ func (self *connectManager) Disconnect(ssid string, timeout time.Duration) (r bo
 	return false, nil
 }
 
-func (self *connectManager) Connect(ssid string, password string, timeout time.Duration) (connectionInfo ConnectionInfo, e error) {
+func (self *ConnectManager) Connect(ssid string, password string, timeout time.Duration) (connectionInfo ConnectionInfo, e error) {
 	self.deadTime = time.Now().Add(timeout)
 	self.context = &connectContext{}
 	self.context.scanDone = make(chan bool)
@@ -94,7 +94,7 @@ func (self *connectManager) Connect(ssid string, password string, timeout time.D
 	return
 }
 
-func (self *connectManager) connectToBSS(bss *wpa_dbus.BSSWPA, iface *wpa_dbus.InterfaceWPA, password string) (e error) {
+func (self *ConnectManager) connectToBSS(bss *wpa_dbus.BSSWPA, iface *wpa_dbus.InterfaceWPA, password string) (e error) {
 	addNetworkArgs := map[string]dbus.Variant{
 		"ssid": dbus.MakeVariant(bss.SSID),
 		"psk":  dbus.MakeVariant(password)}
@@ -132,7 +132,7 @@ func (self *connectManager) connectToBSS(bss *wpa_dbus.BSSWPA, iface *wpa_dbus.I
 	return
 }
 
-func (self *connectManager) onSignal(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
+func (self *ConnectManager) onSignal(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	log.Log.Debug(signal.Name, signal.Path)
 	switch signal.Name {
 	case "fi.w1.wpa_supplicant1.Interface.BSSAdded":
@@ -148,7 +148,7 @@ func (self *connectManager) onSignal(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	}
 }
 
-func (self *connectManager) readNetAddress() (e error) {
+func (self *ConnectManager) readNetAddress() (e error) {
 	if netIface, err := net.InterfaceByName(self.NetInterface); err == nil {
 		for time.Now().Before(self.deadTime) && !self.context.hasIP() {
 			if addrs, err := netIface.Addrs(); err == nil {
@@ -181,7 +181,7 @@ func (self *connectManager) readNetAddress() (e error) {
 	return
 }
 
-func (self *connectManager) processScanDone(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
+func (self *ConnectManager) processScanDone(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	log.Log.Debug("processScanDone")
 	if self.context.phaseWaitForScanDone {
 		self.context.phaseWaitForScanDone = false
@@ -189,7 +189,7 @@ func (self *connectManager) processScanDone(wpa *wpa_dbus.WPA, signal *dbus.Sign
 	}
 }
 
-func (self *connectManager) processInterfacePropertiesChanged(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
+func (self *ConnectManager) processInterfacePropertiesChanged(wpa *wpa_dbus.WPA, signal *dbus.Signal) {
 	log.Log.Debug("processInterfacePropertiesChanged")
 	log.Log.Debug("phaseWaitForInterfaceConnected", self.context.phaseWaitForInterfaceConnected)
 	if self.context.phaseWaitForInterfaceConnected {
@@ -234,12 +234,8 @@ type connectContext struct {
 	error                          error
 }
 
-type connectManager struct {
+type ConnectManager struct {
 	context      *connectContext
 	deadTime     time.Time
 	NetInterface string
 }
-
-var (
-	ConnectManager = &connectManager{NetInterface: "wlan0"}
-)
